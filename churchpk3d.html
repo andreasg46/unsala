@@ -31,7 +31,9 @@
     const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
     const createScene = function () {
-        const scene = new BABYLON.Scene(engine);
+        engine.enableOfflineSupport = false;
+
+        var scene = new BABYLON.Scene(engine);
 
         //Parameters: name, alpha, beta, radius, target position, scene
         var camera = new BABYLON.ArcRotateCamera("Camera", 0,0,0, new BABYLON.Vector3(0, 15, 0), scene);
@@ -48,6 +50,20 @@
         // This attaches the camera to the canvas
         camera.attachControl(canvas, true);
 
+        // Creates a light, aiming 0,1,0 - to the sky
+        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
+        // Dim the light a small amount - 0 to 1
+        light.intensity = 0.7;
+
+        engine.displayLoadingUI();
+
+        BABYLON.SceneLoader.ImportMesh("", "./js/models/", "Basilica_scaled_10.glb", scene, function (newMeshes){
+            engine.hideLoadingUI();
+        }); //Name of the model loads one model
+
+
+
         var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000.0 }, scene);
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -58,13 +74,7 @@
         skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox/skybox", scene);
         skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
-        // Creates a light, aiming 0,1,0 - to the sky
-        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
-        // Dim the light a small amount - 0 to 1
-        light.intensity = 0.7;
-
-        const basilica = BABYLON.SceneLoader.ImportMeshAsync("", "./js/models/", "Basilica_scaled_10.glb"); //Name of the model loads one model
 
 
         return scene;
